@@ -20,6 +20,13 @@ if prompt := st.chat_input("Type your message...", max_chars=100):
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").markdown(prompt)
 
+    prompt = "You are an AI assistant created by Krishna Therokar using Gemini API and Streamlit. Provide your response to the last user message:\n"
+
+    # add chat history
+    for msg in st.session_state.messages[-6:]:
+        role = "You" if msg["role"] == "user" else "Gemini"
+        prompt += f"{role}: {msg["content"]}\n"
+    
     response = model.generate_content(prompt)
     reply = response.text.strip()
     
