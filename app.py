@@ -25,7 +25,7 @@ if prompt := st.chat_input("Type your message...", max_chars=100):
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").markdown(prompt)
 
-    prompt = "You are an AI assistant created by Krishna Therokar using Gemini API and Streamlit. Provide your response to the last user message. Directly start your response without 'Gemini':\n"
+    prompt = "Instructions: You are an AI assistant created by Krishna Therokar using Gemini API and Streamlit. Provide your response to the last user message. Directly start your response without 'Gemini'.\nChat history:\n"
 
     # add chat history
     for msg in st.session_state.messages[-6:]:
@@ -42,12 +42,17 @@ if prompt := st.chat_input("Type your message...", max_chars=100):
             typing_placeholder.markdown(f"Gemini is typing{next(dots)}")
             time.sleep(0.2)
         
-        response = model.generate_content(prompt)
-        reply = response.text.strip()
-        
-        typing_placeholder.markdown(reply)
-    
-    st.session_state.messages.append({"role": "assistant", "content": reply})
+        try:
+            response = model.generate_content(prompt)
+            reply = response.text.strip()
+
+            typing_placeholder.markdown(reply)
+            st.session_state.messages.append({"role": "assistant", "content": reply})
+
+        except Exception as e:
+            error_message = "Gemini failed to respond. Please try again later."
+            typing_placeholder.markdown(error_message)
+            st.error(e)
 
     # scroll to bottom
     scroll_anchor.markdown("<div id='scroll-to-bottom'></div>", unsafe_allow_html=True)
